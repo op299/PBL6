@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pbl/pages/dashboard.dart';
+import 'package:pbl/routes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF66C457)),
         useMaterial3: true,
       ),
-      home: const DashboardPage(),
+      initialRoute: AppRoutes.dashboard,
+      routes: AppRoutes.getRoutes(),
     );
   }
 }
