@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../widgets/DetectionOverlay.dart';
 import '../../data/repositories/web_socket_repository_impl.dart';
 import '../../domain/repositories/i_web_socket_repository.dart';
 
@@ -8,61 +10,54 @@ class WebSocketPage extends StatefulWidget {
 }
 
 class _WebSocketPageState extends State<WebSocketPage> {
-  // Khởi tạo Repository (Trong thực tế nên dùng Dependency Injection như GetIt hoặc Provider)
   final IWebSocketRepository _repository = WebSocketRepositoryImpl();
-  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // Thay đổi URL phù hợp với FastAPI của bạn
-    _repository.connect('ws://192.168.1.100:8000/api/v1/ws/app');
+    _repository.connect('ws://192.168.1.103:8000/api/v1/ws/app');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Clean Arch WebSocket")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                labelText: 'Gửi tin nhắn',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
-                    if (_controller.text.isNotEmpty) {
-                      _repository.sendMessage(_controller.text);
-                      _controller.clear();
-                    }
-                  },
+      backgroundColor: Colors.black,
+      appBar: AppBar(title: const Text("Real-time Object Detection")),
+      body: StreamBuilder(
+        stream: _repository.messages,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData)
+            return const Center(child: CircularProgressIndicator());
+          final data = jsonDecode(snapshot.data);
+          final imageBytes = base64Decode(data['image']);
+          final detections = data['detections'] as List<dynamic>;
+
+          return Column(
+            children: [
+              AspectRatio(
+                aspectRatio: 320 / 240,
+                child: Stack(
+                  children: [
+                    Image.memory(
+                      imageBytes,
+                      width: double.infinity,
+                      fit: BoxFit.contain,
+                      gaplessPlayback: true,
+                    ),
+                    DetectionOverlay(
+                      detections: detections,
+                      originalImageSize: const Size(320, 240),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            Expanded(
-              child: StreamBuilder(
-                stream: _repository.messages,
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) return Text('Lỗi: ${snapshot.error}');
-                  if (!snapshot.hasData)
-                    return Center(child: Text("Đang chờ dữ liệu..."));
-
-                  return ListView(
-                    children: [
-                      ListTile(
-                        title: Text("Server phản hồi:"),
-                        subtitle: Text("${snapshot.data}"),
-                      ),
-                    ],
-                  );
-                },
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text("Logs", style: TextStyle(color: Colors.white)),
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -70,7 +65,6 @@ class _WebSocketPageState extends State<WebSocketPage> {
   @override
   void dispose() {
     _repository.disconnect();
-    _controller.dispose();
     super.dispose();
   }
 }
