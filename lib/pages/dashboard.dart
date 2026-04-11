@@ -106,7 +106,7 @@ class DashboardPage extends StatelessWidget {
               bottom: 0,
               left: 0,
               right: 0,
-              child: _buildBottomNav(scale),
+              child: _buildBottomNav(context, scale),
             ),
           ],
         ),
@@ -253,7 +253,7 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNav(double scale) {
+  Widget _buildBottomNav(BuildContext context, double scale) {
     return SizedBox(
       height: 250 * scale,
       child: Stack(
@@ -282,7 +282,16 @@ class DashboardPage extends StatelessWidget {
               children: [
                 _buildNavIcon(Icons.favorite_rounded, 'FAVORITE', scale),
                 const Spacer(),
-                _buildNavIcon(Icons.settings_rounded, 'SETTING', scale),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.webSocket);
+                  },
+                  child: _buildNavIcon(
+                    Icons.settings_rounded,
+                    'SETTING',
+                    scale,
+                  ),
+                ),
               ],
             ),
           ),
