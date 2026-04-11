@@ -1,15 +1,12 @@
+import 'dart:convert';
+
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import '../../domain/repositories/i_web_socket_repository.dart';
+import '../models/detection_model.dart';
 
 class WebSocketRepositoryImpl implements IWebSocketRepository {
   WebSocketChannel? _channel;
-
-  @override
-  Stream<dynamic> get messages {
-    if (_channel == null) return const Stream.empty();
-    return _channel!.stream;
-  }
 
   @override
   void connect(String url) {
@@ -27,6 +24,16 @@ class WebSocketRepositoryImpl implements IWebSocketRepository {
     } catch (e) {
       print("Không thể khởi tạo kết nối: $e");
     }
+  }
+
+  @override
+  Stream<DetectionModel> get messages {
+    return _channel!.stream.map((rawString) {
+      final Map<String, dynamic> json = jsonDecode(rawString);
+      return DetectionModel.fromJson(
+        json,
+      ); 
+    });
   }
 
   @override

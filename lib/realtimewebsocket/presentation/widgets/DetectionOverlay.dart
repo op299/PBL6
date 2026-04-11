@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'color_widgets.dart';
 
 class DetectionOverlay extends StatelessWidget {
   final List<dynamic> detections;
@@ -19,7 +20,7 @@ class DetectionOverlay extends StatelessWidget {
 
         return Stack(
           children: detections.map((det) {
-            final box = det['box'];
+            final box = det['bbox'];
             if (box == null) return const SizedBox.shrink();
             double left = box[0] * scaleX;
             double top = box[1] * scaleY;
@@ -40,19 +41,18 @@ class DetectionOverlay extends StatelessWidget {
   }
 
   Widget _buildBox(String label, double confidence) {
+    final Color boxColor = getColorForLabel(label);
     return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.greenAccent, width: 2),
-      ),
+      decoration: BoxDecoration(border: Border.all(color: boxColor, width: 2)),
       child: Align(
         alignment: Alignment.topLeft,
         child: Container(
-          color: Colors.greenAccent,
+          color: boxColor,
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
           child: Text(
-            "$label ${(confidence * 100).toStringAsFixed(0)}%",
+            "${label.toUpperCase()} ${(confidence * 100).toStringAsFixed(0)}%",
             style: const TextStyle(
-              color: Colors.black,
+              color: Colors.white,
               fontSize: 10,
               fontWeight: FontWeight.bold,
             ),
