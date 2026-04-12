@@ -4,11 +4,13 @@ import 'color_widgets.dart';
 class DetectionOverlay extends StatelessWidget {
   final List<dynamic> detections;
   final Size originalImageSize;
+  final Function(String label) onBoxTap;
 
   const DetectionOverlay({
     Key? key,
     required this.detections,
     required this.originalImageSize,
+    required this.onBoxTap,
   }) : super(key: key);
 
   @override
@@ -22,6 +24,7 @@ class DetectionOverlay extends StatelessWidget {
           children: detections.map((det) {
             final box = det['bbox'];
             if (box == null) return const SizedBox.shrink();
+
             double left = box[0] * scaleX;
             double top = box[1] * scaleY;
             double width = (box[2] - box[0]) * scaleX;
@@ -32,7 +35,11 @@ class DetectionOverlay extends StatelessWidget {
               top: top,
               width: width,
               height: height,
-              child: _buildBox(det['label'] ?? '', det['confidence'] ?? 0.0),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => onBoxTap(det['class_name'] ?? 'Unknown'),
+                child: _buildBox(det['class_name'] ?? '', det['confidence'] ?? 0.0),
+              ),
             );
           }).toList(),
         );
