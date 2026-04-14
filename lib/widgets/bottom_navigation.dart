@@ -54,8 +54,8 @@ class BottomNavigation extends StatelessWidget {
                 GestureDetector(
                   onTap: onSettingTap,
                   child: _NavIcon(
-                    icon: Icons.settings_rounded,
-                    label: 'SETTING',
+                    icon: Icons.live_tv_rounded,
+                    label: 'Live',
                     scale: scale,
                   ),
                 ),
