@@ -16,7 +16,8 @@ dependencies:
   dio: ^5.4.1
 
   # State Management
-  flutter_bloc: ^8.1.3
+  bloc: ^9.2.0
+  flutter_bloc: ^9.1.1
   equatable: ^2.0.5 # Hỗ trợ so sánh object trong Bloc rất tốt
   #web  socket
   web_socket_channel: ^3.0.1 
