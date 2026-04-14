@@ -65,8 +65,12 @@ class _VocabularyPageState extends State<VocabularyPage> {
         body: const Center(child: CircularProgressIndicator()),
       );
     }
-    if(_data == null) {
-      return Scaffold(body: Center(child: Text("Không tìm thấy dữ liệu cho từ '${widget.word}'")));
+    if (_data == null) {
+      return Scaffold(
+        body: Center(
+          child: Text("Không tìm thấy dữ liệu cho từ '${widget.word}'"),
+        ),
+      );
     }
     return Scaffold(
       appBar: AppBar(title: Text("Học từ vựng")),
@@ -85,6 +89,15 @@ class _VocabularyPageState extends State<VocabularyPage> {
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Phiên âm: ${_data?.pronunciation ?? ''}",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey[600],
                     ),
                   ),
                   Text(
