@@ -90,6 +90,9 @@ class DashboardPage extends StatelessWidget {
               title: 'QUIZ',
               icon: Icons.extension_rounded,
               scale: scale,
+              onTap: () {
+                Navigator.pushNamed(context, AppRoutes.quiz);
+              },
             ),
             // Bottom Large Card: Saved
             _buildLargeCard(
