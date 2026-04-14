@@ -287,8 +287,8 @@ class DashboardPage extends StatelessWidget {
                     Navigator.pushNamed(context, AppRoutes.webSocket);
                   },
                   child: _buildNavIcon(
-                    Icons.settings_rounded,
-                    'SETTING',
+                    Icons.camera_rear_outlined,
+                    'WebSocket',
                     scale,
                   ),
                 ),

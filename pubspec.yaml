@@ -20,6 +20,7 @@ dependencies:
   equatable: ^2.0.5 # Hỗ trợ so sánh object trong Bloc rất tốt
   #web  socket
   web_socket_channel: ^3.0.1 
+  audioplayers: ^6.6.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

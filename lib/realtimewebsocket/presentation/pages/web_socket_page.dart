@@ -67,7 +67,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
                       originalImageSize: const Size(320, 240),
                       onBoxTap: (label) {
                         print("Bạn đã chạm vào: $label");
-                        Navigator.pushNamed(context, AppRoutes.vocabulary);
+                        Navigator.pushNamed(context, AppRoutes.vocabularyWebsocket);
                       },
                     ),
                   ],
@@ -121,7 +121,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
                         ),
                         onTap: () {
                           print("Bạn đã chạm vào: $label");
-                          Navigator.pushNamed(context, AppRoutes.vocabulary);
+                          Navigator.pushNamed(context, AppRoutes.vocabularyWebsocket);
                         },
                       );
                     },
