@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:pbl/pages/vocabulary.dart';
+import 'package:pbl/core/constants/app_config.dart';
 import '../../../routes.dart';
 import '../widgets/color_widgets.dart';
 import '../widgets/DetectionOverlay.dart';
@@ -20,7 +20,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
   void initState() {
     super.initState();
     // Thay đổi IP cho đúng với máy tính của bạn
-    _repository.connect('ws://192.168.1.103:8000/api/v1/ws/app');
+    _repository.connect(AppConfig.wsUrl);
   }
 
   @override

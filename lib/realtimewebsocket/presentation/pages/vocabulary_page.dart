@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:audioplayers/audioplayers.dart';
 
+import '../../../core/constants/app_config.dart';
 import '../../data/models/vocabulary_model.dart';
 
 class VocabularyPage extends StatefulWidget {
@@ -24,11 +25,11 @@ class _VocabularyPageState extends State<VocabularyPage> {
     super.initState();
     _fetchVocabulary();
   }
+
   Future<void> _fetchVocabulary() async {
-    final baseUrl = "http://192.168.1.103:8000";
     try {
       final response = await http.get(
-        Uri.parse("$baseUrl/api/v1/vocabulary/${widget.word}"),
+        Uri.parse(AppConfig.getVocabularyUrl(widget.word)),
       );
 
       if (response.statusCode == 200) {
@@ -46,10 +47,7 @@ class _VocabularyPageState extends State<VocabularyPage> {
   void _playAudio() async {
     if (_data == null || _data!.audioUrl.isEmpty) return;
 
-    final baseUrl = "http://192.168.1.103:8000";
-    final fullAudioUrl =
-        baseUrl +
-        _data!.audioUrl;
+    final fullAudioUrl = AppConfig.getAudioUrl(_data!.audioUrl);
 
     await _audioPlayer.play(UrlSource(fullAudioUrl));
   }
