@@ -57,7 +57,7 @@ class _VocabularyPageState extends State<VocabularyPage> {
     return Scaffold(
       appBar: AppBar(title: Text("Học từ vựng")),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
@@ -66,7 +66,7 @@ class _VocabularyPageState extends State<VocabularyPage> {
                   // 1. Tiếng Anh
                   Text(
                     _data!.wordEn.toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue,
@@ -82,7 +82,7 @@ class _VocabularyPageState extends State<VocabularyPage> {
                   // 3. Nút Loa
                   Center(
                     child: IconButton(
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.volume_up,
                         size: 80,
                         color: Colors.orange,
@@ -90,19 +90,19 @@ class _VocabularyPageState extends State<VocabularyPage> {
                       onPressed: _playAudio,
                     ),
                   ),
-                  Center(child: Text("Bấm để nghe phát âm")),
+                  const Center(child: Text("Bấm để nghe phát âm")),
 
                   const SizedBox(height: 40),
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(15),
                     decoration: BoxDecoration(
                       color: Colors.blue[50],
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       _data!.exampleEn,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontStyle: FontStyle.italic,
                       ),
