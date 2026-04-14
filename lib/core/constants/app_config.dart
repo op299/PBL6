@@ -4,7 +4,7 @@ class AppConfig {
 
   static const String baseUrl = 'http://$ipAddress:$port';
   static const String wsUrl = 'ws://$ipAddress:$port/api/v1/ws/app';
-  static String getVocabularyUrl(String word) => '$baseUrl/api/v1/vocabulary/$word';
+  static String getVocabularyUrl(String word) => '$baseUrl/api/v1/objects/$word';
   
   static String getAudioUrl(String relativePath) => '$baseUrl$relativePath';
 }

@@ -37,7 +37,12 @@ class DetectionOverlay extends StatelessWidget {
               height: height,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: () => onBoxTap(det['class_name'] ?? 'Unknown'),
+                onTap: (){
+                  print ("Dữ liệu :$det:");
+
+                  final String label = det ['class_name'] ?? 'Unknown';
+                  onBoxTap(label);
+                },
                 child: _buildBox(det['class_name'] ?? '', det['confidence'] ?? 0.0),
               ),
             );

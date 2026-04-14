@@ -23,24 +23,29 @@ class _VocabularyPageState extends State<VocabularyPage> {
   @override
   void initState() {
     super.initState();
-    _fetchVocabulary();
+    _fetchData();
   }
 
-  Future<void> _fetchVocabulary() async {
+  Future<void> _fetchData() async {
     try {
       final response = await http.get(
         Uri.parse(AppConfig.getVocabularyUrl(widget.word)),
       );
 
       if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+        final decodedData = jsonDecode(utf8.decode(response.bodyBytes));
+        final parsedData = VocabularyData.fromJson(decodedData);
+
         setState(() {
-          _data = VocabularyData.fromJson(jsonResponse);
+          _data = parsedData;
           _isLoading = false;
         });
+      } else {
+        setState(() => _isLoading = false);
       }
     } catch (e) {
-      print("Lỗi tải dữ liệu: $e");
+      print("Lỗi: $e");
+      setState(() => _isLoading = false);
     }
   }
 
@@ -54,6 +59,15 @@ class _VocabularyPageState extends State<VocabularyPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: Text("Học từ vựng")),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    if(_data == null) {
+      return Scaffold(body: Center(child: Text("Không tìm thấy dữ liệu cho từ '${widget.word}'")));
+    }
     return Scaffold(
       appBar: AppBar(title: Text("Học từ vựng")),
       body: _isLoading
@@ -65,7 +79,8 @@ class _VocabularyPageState extends State<VocabularyPage> {
                 children: [
                   // 1. Tiếng Anh
                   Text(
-                    _data!.wordEn.toUpperCase(),
+                    _data?.wordEn ?? ''
+                      ..toUpperCase(),
                     style: const TextStyle(
                       fontSize: 40,
                       fontWeight: FontWeight.bold,

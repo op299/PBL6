@@ -7,6 +7,7 @@ import '../widgets/DetectionOverlay.dart';
 import '../../data/repositories/web_socket_repository_impl.dart';
 import '../../domain/repositories/i_web_socket_repository.dart';
 import '../../data/models/detection_model.dart';
+import 'vocabulary_page.dart';
 
 class WebSocketPage extends StatefulWidget {
   @override
@@ -66,8 +67,14 @@ class _WebSocketPageState extends State<WebSocketPage> {
                       detections: detections,
                       originalImageSize: const Size(320, 240),
                       onBoxTap: (label) {
-                        print("Bạn đã chạm vào: $label");
-                        Navigator.pushNamed(context, AppRoutes.vocabularyWebsocket);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VocabularyPage(
+                              word: label,
+                            ), 
+                          ),
+                        );
                       },
                     ),
                   ],
@@ -120,8 +127,14 @@ class _WebSocketPageState extends State<WebSocketPage> {
                           ),
                         ),
                         onTap: () {
-                          print("Bạn đã chạm vào: $label");
-                          Navigator.pushNamed(context, AppRoutes.vocabularyWebsocket);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => VocabularyPage(
+                                word: label,
+                              ),
+                            ),
+                          );
                         },
                       );
                     },
