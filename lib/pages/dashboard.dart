@@ -48,11 +48,11 @@ class DashboardPage extends StatelessWidget {
               left: 50 * scale,
               width: 475 * scale,
               height: 450 * scale,
-              title: 'VOCABULARY',
-              icon: Icons.menu_book_rounded,
+              title: 'HISTORY',
+              icon: Icons.history_rounded,
               scale: scale,
               onTap: () {
-                Navigator.pushNamed(context, AppRoutes.vocabulary);
+                Navigator.pushNamed(context, AppRoutes.history);
               },
             ),
             // Top Right Card: Grammar

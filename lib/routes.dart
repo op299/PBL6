@@ -7,9 +7,8 @@ import 'pages/vocabulary.dart';
 import 'realtimewebsocket/presentation/pages/web_socket_page.dart';
 import 'package:pbl/pages/dashboard.dart';
 import 'package:pbl/pages/quiz_page.dart';
-import 'package:pbl/pages/vocabulary.dart';
-import 'package:pbl/pages/grammar.dart';
-import 'package:pbl/pages/conversations.dart';
+import 'package:pbl/history/presentation/page/history_page.dart';
+
 
 class AppRoutes {
   static const String dashboard = '/';
@@ -19,17 +18,17 @@ class AppRoutes {
   static const String quiz = '/quiz';
   static const String settings = '/settings';
   static const String webSocket = '/websocket';
+  static const String history = '/history';
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
       dashboard: (context) => const DashboardPage(),
       vocabulary: (context) => const VocabularyPage1(),
       grammar: (context) => const GrammarPage(),
-
       conversations: (context) => const ConversationsPage(),
       webSocket: (context) => WebSocketPage(),
-      
       quiz: (context) => const QuizPage(),
+      history: (context) => const HistoryPage(),
     };
   }
 }
