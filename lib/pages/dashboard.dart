@@ -10,6 +10,21 @@ class DashboardPage extends StatelessWidget {
     final double scale = screenWidth / 1080;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'LEARNING',
+          style: TextStyle(
+            fontSize: 50 * scale,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF1C1C1C),
+            letterSpacing: 2 * scale,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 1,
+      ),
+
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -20,103 +35,89 @@ class DashboardPage extends StatelessWidget {
             colors: [Color(0xFFFFFFFF), Color(0xFFEAF0EA)],
           ),
         ),
-        child: Stack(
-          children: [
-            // Header Row: LEARNING and Icons
-            Positioned(
-              top: 100 * scale,
-              left: 50 * scale,
-              right: 50 * scale,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'LEARNING',
-                    style: TextStyle(
-                      fontSize: 80 * scale,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1C1C1C),
-                      letterSpacing: 2 * scale,
-                    ),
-                  ),
-                ],
-              ),
+
+        child: SingleChildScrollView(
+          child: SizedBox(
+            height: 2000 * scale,
+            child: Stack(
+              children: [
+                _buildFeatureCard(
+                  top: 150 * scale,
+                  left: 50 * scale,
+                  width: 475 * scale,
+                  height: 450 * scale,
+                  title: 'VOCABULARY',
+                  icon: Icons.menu_book_rounded,
+                  scale: scale,
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.vocabulary);
+                  },
+                ),
+
+                _buildFeatureCard(
+                  top: 150 * scale,
+                  left: 555 * scale,
+                  width: 475 * scale,
+                  height: 450 * scale,
+                  title: 'GRAMMAR',
+                  icon: Icons.spellcheck_rounded,
+                  scale: scale,
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.grammar);
+                  },
+                ),
+
+                _buildFeatureCard(
+                  top: 750 * scale,
+                  left: 50 * scale,
+                  width: 475 * scale,
+                  height: 450 * scale,
+                  title: 'CONVERSATIONS',
+                  icon: Icons.people_alt_rounded,
+                  scale: scale,
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.conversations);
+                  },
+                ),
+
+                _buildFeatureCard(
+                  top: 750 * scale,
+                  left: 555 * scale,
+                  width: 475 * scale,
+                  height: 450 * scale,
+                  title: 'QUIZ',
+                  icon: Icons.extension_rounded,
+                  scale: scale,
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.quiz);
+                  },
+                ),
+
+                _buildLargeCard(
+                  top: 1400 * scale,
+                  left: 50 * scale,
+                  width: 980 * scale,
+                  height: 320 * scale,
+                  title: 'SAVED FILE',
+                  icon: Icons.download_done_rounded,
+                  scale: scale,
+                ),
+
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: _buildBottomNav(scale, context),
+                ),
+              ],
             ),
-            // Top Left Card: Vocabulary
-            _buildFeatureCard(
-              top: 400 * scale,
-              left: 50 * scale,
-              width: 475 * scale,
-              height: 450 * scale,
-              title: 'VOCABULARY',
-              icon: Icons.menu_book_rounded,
-              scale: scale,
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.vocabulary);
-              },
-            ),
-            // Top Right Card: Grammar
-            _buildFeatureCard(
-              top: 400 * scale,
-              left: 555 * scale,
-              width: 475 * scale,
-              height: 450 * scale,
-              title: 'GRAMMAR',
-              icon: Icons.spellcheck_rounded,
-              scale: scale,
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.grammar);
-              },
-            ),
-            // Bottom Left Card: Community
-            _buildFeatureCard(
-              top: 1000 * scale,
-              left: 50 * scale,
-              width: 475 * scale,
-              height: 450 * scale,
-              title: 'CONVERSATIONS',
-              icon: Icons.people_alt_rounded,
-              scale: scale,
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.conversations);
-              },
-            ),
-            // Bottom Right Card: Quiz
-            _buildFeatureCard(
-              top: 1000 * scale,
-              left: 555 * scale,
-              width: 475 * scale,
-              height: 450 * scale,
-              title: 'QUIZ',
-              icon: Icons.extension_rounded,
-              scale: scale,
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.quiz);
-              },
-            ),
-            // Bottom Large Card: Saved
-            _buildLargeCard(
-              top: 1800 * scale,
-              left: 50 * scale,
-              width: 980 * scale,
-              height: 320 * scale,
-              title: 'SAVED FILE',
-              icon: Icons.download_done_rounded,
-              scale: scale,
-            ),
-            // Bottom Navigation Area
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: _buildBottomNav(scale),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
+  // ================= FEATURE CARD =================
   Widget _buildFeatureCard({
     required double top,
     required double left,
@@ -156,7 +157,6 @@ class DashboardPage extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              // Decorative Circle 1
               Positioned(
                 top: 40 * scale,
                 right: 40 * scale,
@@ -165,7 +165,7 @@ class DashboardPage extends StatelessWidget {
                   backgroundColor: const Color(0xFF89E287),
                 ),
               ),
-              // Decorative Circle 2
+
               Positioned(
                 bottom: 60 * scale,
                 left: 40 * scale,
@@ -174,6 +174,7 @@ class DashboardPage extends StatelessWidget {
                   backgroundColor: const Color(0xFF89E287),
                 ),
               ),
+
               Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -183,7 +184,9 @@ class DashboardPage extends StatelessWidget {
                       size: 80 * scale,
                       color: const Color(0xFF1C1C1C),
                     ),
+
                     SizedBox(height: 20 * scale),
+
                     Text(
                       title,
                       style: TextStyle(
@@ -203,6 +206,7 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
+  // ================= LARGE CARD =================
   Widget _buildLargeCard({
     required double top,
     required double left,
@@ -236,7 +240,9 @@ class DashboardPage extends StatelessWidget {
         child: Row(
           children: [
             Icon(icon, size: 100 * scale, color: const Color(0xFF1C1C1C)),
+
             SizedBox(width: 40 * scale),
+
             Text(
               title,
               style: TextStyle(
@@ -245,7 +251,9 @@ class DashboardPage extends StatelessWidget {
                 color: const Color(0xFF1C1C1C),
               ),
             ),
+
             const Spacer(),
+
             const ColorFiltered(
               colorFilter: ColorFilter.mode(Color(0xFF89E287), BlendMode.srcIn),
               child: Icon(Icons.arrow_forward_ios_rounded),
@@ -256,13 +264,13 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNav(double scale) {
+  // ================= BOTTOM NAV =================
+  Widget _buildBottomNav(double scale, BuildContext context) {
     return SizedBox(
       height: 250 * scale,
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [
-          // Background shape
           Container(
             height: 200 * scale,
             decoration: const BoxDecoration(
@@ -273,7 +281,7 @@ class DashboardPage extends StatelessWidget {
               ),
             ),
           ),
-          // Icons
+
           Padding(
             padding: EdgeInsets.only(
               bottom: 40 * scale,
@@ -284,12 +292,19 @@ class DashboardPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildNavIcon(Icons.favorite_rounded, 'FAVORITE', scale),
+
                 const Spacer(),
-                _buildNavIcon(Icons.settings_rounded, 'SETTING', scale),
+
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.profile);
+                  },
+                  child: _buildNavIcon(Icons.person_rounded, 'PROFILE', scale),
+                ),
               ],
             ),
           ),
-          // Center Home Button
+
           Positioned(
             bottom: 60 * scale,
             child: Container(
@@ -322,6 +337,7 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
+  // ================= NAV ICON =================
   Widget _buildNavIcon(IconData icon, String label, double scale) {
     return Column(
       mainAxisSize: MainAxisSize.min,

@@ -4,14 +4,15 @@ class BottomNavigation extends StatelessWidget {
   final double scale;
   final VoidCallback? onHomeTap;
   final VoidCallback? onFavoriteTap;
-  final VoidCallback? onSettingTap;
+  final VoidCallback?
+  onProfileTap; // Đổi tên từ onSettingTap thành onProfileTap
 
   const BottomNavigation({
     super.key,
     required this.scale,
     this.onHomeTap,
     this.onFavoriteTap,
-    this.onSettingTap,
+    this.onProfileTap, // Cập nhật constructor
   });
 
   @override
@@ -21,7 +22,6 @@ class BottomNavigation extends StatelessWidget {
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [
-          // Background shape
           Container(
             height: 200 * scale,
             decoration: const BoxDecoration(
@@ -32,7 +32,6 @@ class BottomNavigation extends StatelessWidget {
               ),
             ),
           ),
-          // Icons
           Padding(
             padding: EdgeInsets.only(
               bottom: 40 * scale,
@@ -52,17 +51,17 @@ class BottomNavigation extends StatelessWidget {
                 ),
                 const Spacer(),
                 GestureDetector(
-                  onTap: onSettingTap,
+                  onTap: onProfileTap, // Gọi onProfileTap
                   child: _NavIcon(
-                    icon: Icons.settings_rounded,
-                    label: 'SETTING',
+                    icon: Icons
+                        .person_rounded, // Đổi icon từ settings sang person
+                    label: 'PROFILE', // Đổi label
                     scale: scale,
                   ),
                 ),
               ],
             ),
           ),
-          // Center Home Button
           Positioned(
             bottom: 60 * scale,
             child: GestureDetector(
