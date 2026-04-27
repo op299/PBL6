@@ -4,8 +4,8 @@ import 'package:pbl/widgets/bottom_navigation.dart';
 import 'package:pbl/routes.dart';
 
 
-class VocabularyPage extends StatelessWidget {
-  const VocabularyPage({super.key});
+class VocabularyPage1 extends StatelessWidget {
+  const VocabularyPage1({super.key});
 
   @override
   Widget build(BuildContext context) {
