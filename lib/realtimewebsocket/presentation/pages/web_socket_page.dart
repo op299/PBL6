@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pbl/core/constants/app_config.dart';
-import '../../../routes.dart';
 import '../widgets/color_widgets.dart';
 import '../widgets/DetectionOverlay.dart';
 import '../../data/repositories/web_socket_repository_impl.dart';
@@ -70,9 +69,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => VocabularyPage(
-                              word: label,
-                            ), 
+                            builder: (context) => VocabularyPage(word: label),
                           ),
                         );
                       },
@@ -130,9 +127,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => VocabularyPage(
-                                word: label,
-                              ),
+                              builder: (context) => VocabularyPage(word: label),
                             ),
                           );
                         },

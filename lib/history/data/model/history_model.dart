@@ -22,7 +22,9 @@ class LearningHistory {
       objectNameVn: json['object_name_vn'] ?? '',
       confidence: (json['confidence'] ?? 0.0).toDouble(),
       sessionType: json['session_type'] ?? 'detection',
-      timestamp: DateTime.parse(json['timestamp'] ?? DateTime.now().toIso8601String()),
+      timestamp: DateTime.parse(
+        json['timestamp'] ?? DateTime.now().toIso8601String(),
+      ),
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pbl/routes.dart';
-import 'package:pbl/pages/login_page.dart'; // Import LoginPage
 import 'package:shared_preferences/shared_preferences.dart'; // Thêm để kiểm tra token
 
 void main() {
