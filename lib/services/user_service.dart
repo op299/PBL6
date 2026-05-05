@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserService {
-  final String _baseUrl = "http://10.67.143.118:8000/api/v1/auth";
+  final String _baseUrl = "http://192.168.10.155/api/v1/auth";
 
   Future<Map<String, dynamic>> getProfile() async {
     try {

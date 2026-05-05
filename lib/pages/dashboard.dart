@@ -46,42 +46,15 @@ class DashboardPage extends StatelessWidget {
                   left: 50 * scale,
                   width: 475 * scale,
                   height: 450 * scale,
-                  title: 'VOCABULARY',
-                  icon: Icons.menu_book_rounded,
+                  title: 'HISTORY',
+                  icon: Icons.history_rounded,
                   scale: scale,
                   onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.vocabulary);
+                    Navigator.pushNamed(context, AppRoutes.history);
                   },
                 ),
-
                 _buildFeatureCard(
                   top: 150 * scale,
-                  left: 555 * scale,
-                  width: 475 * scale,
-                  height: 450 * scale,
-                  title: 'GRAMMAR',
-                  icon: Icons.spellcheck_rounded,
-                  scale: scale,
-                  onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.grammar);
-                  },
-                ),
-
-                _buildFeatureCard(
-                  top: 750 * scale,
-                  left: 50 * scale,
-                  width: 475 * scale,
-                  height: 450 * scale,
-                  title: 'CONVERSATIONS',
-                  icon: Icons.people_alt_rounded,
-                  scale: scale,
-                  onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.conversations);
-                  },
-                ),
-
-                _buildFeatureCard(
-                  top: 750 * scale,
                   left: 555 * scale,
                   width: 475 * scale,
                   height: 450 * scale,
@@ -93,14 +66,17 @@ class DashboardPage extends StatelessWidget {
                   },
                 ),
 
-                _buildLargeCard(
-                  top: 1400 * scale,
+                _buildFeatureCard(
+                  top: 700 * scale,
                   left: 50 * scale,
                   width: 980 * scale,
                   height: 320 * scale,
-                  title: 'SAVED FILE',
-                  icon: Icons.download_done_rounded,
+                  title: 'LIVE WEB SOCKET',
+                  icon: Icons.live_tv,
                   scale: scale,
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.webSocket);
+                  },
                 ),
 
                 Positioned(
@@ -215,6 +191,7 @@ class DashboardPage extends StatelessWidget {
     required String title,
     required IconData icon,
     required double scale,
+    VoidCallback? onTap,
   }) {
     return Positioned(
       top: top,
