@@ -5,6 +5,7 @@ class LearningHistory {
   final double confidence;
   final String sessionType;
   final DateTime timestamp;
+  final String? imageData; 
 
   LearningHistory({
     required this.historyId,
@@ -13,6 +14,7 @@ class LearningHistory {
     required this.confidence,
     required this.sessionType,
     required this.timestamp,
+    this.imageData, 
   });
 
   factory LearningHistory.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,21 @@ class LearningHistory {
       sessionType: json['session_type'] ?? 'detection',
       timestamp: DateTime.parse(
         json['timestamp'] ?? DateTime.now().toIso8601String(),
+      ),
+    );
+  }
+
+
+  factory LearningHistory.fromLocalMap(Map<String, dynamic> map) {
+    return LearningHistory(
+      historyId: map['id'] ?? 0,
+      objectNameEn: map['object_name'] ?? '', 
+      objectNameVn: '', 
+      confidence: (map['confidence'] ?? 0.0).toDouble(),
+      sessionType: 'detection',
+      imageData: map['image_data'],
+      timestamp: DateTime.parse(
+        map['timestamp'] ?? DateTime.now().toIso8601String(),
       ),
     );
   }
