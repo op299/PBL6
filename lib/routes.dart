@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:pbl/pages/dashboard.dart';
 import 'package:pbl/pages/login_page.dart';
+import 'package:pbl/pages/quiz_mode_page.dart';
 import 'package:pbl/pages/quiz_page.dart';
 import 'package:pbl/pages/register_page.dart';
+import 'package:pbl/pages/result_page.dart';
 import 'package:pbl/pages/vocabulary.dart';
 import 'package:pbl/pages/grammar.dart';
 import 'package:pbl/pages/conversations.dart';
@@ -18,11 +20,12 @@ class AppRoutes {
   static const String vocabulary = '/vocabulary';
   static const String grammar = '/grammar';
   static const String conversations = '/conversations';
-  static const String quiz = '/quiz';
+  static const String quiz = '/quiz-mode';
   static const String profile = '/profile'; // Thêm route cho ProfilePage
   static const String settings = '/settings';
   static const String webSocket = '/websocket';
   static const String history = '/history';
+  static const String quizResult = '/quiz_result';
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
@@ -33,7 +36,7 @@ class AppRoutes {
       grammar: (context) => const GrammarPage(),
       conversations: (context) => const ConversationsPage(),
       webSocket: (context) => WebSocketPage(),
-      quiz: (context) => const QuizPage(),
+      quiz: (context) => const QuizModePage(),
       profile: (context) => const ProfilePage(),
       history: (context) => const HistoryPage(),
     };

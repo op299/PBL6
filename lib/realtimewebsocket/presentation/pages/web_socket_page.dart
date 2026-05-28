@@ -7,6 +7,7 @@ import '../../data/repositories/web_socket_repository_impl.dart';
 import '../../domain/repositories/i_web_socket_repository.dart';
 import '../../data/models/detection_model.dart';
 import 'vocabulary_page.dart';
+import '../../../core/helpers/local_db_helper.dart'; 
 
 class WebSocketPage extends StatefulWidget {
   @override
@@ -15,12 +16,32 @@ class WebSocketPage extends StatefulWidget {
 
 class _WebSocketPageState extends State<WebSocketPage> {
   final IWebSocketRepository _repository = WebSocketRepositoryImpl();
+  // KHỞI TẠO HELPER ĐỂ LƯU ẢNH VÀ LỊCH SỬ
+  final LocalDbHelper _dbHelper = LocalDbHelper();
 
   @override
   void initState() {
     super.initState();
-    // Thay đổi IP cho đúng với máy tính của bạn
     _repository.connect(AppConfig.wsUrl);
+  }
+
+  // HÀM XỬ LÝ LƯU VÀ CHUYỂN TRANG (Dùng chung cho cả Box và List)
+  void _handleSelection(String label, String imageBase64) async {
+    // 1. CHỤP ẢNH & LƯU LẠI: Lưu tên vật thể và chuỗi ảnh vào máy
+    await _dbHelper.saveToHistory(label, imageBase64);
+    
+    // In log để bạn kiểm tra trong Console
+    print(" Đã chụp ảnh vật thể: $label");
+
+    // 2. CHUYỂN TRANG
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VocabularyPage(word: label),
+        ),
+      );
+    }
   }
 
   @override
@@ -35,16 +56,12 @@ class _WebSocketPageState extends State<WebSocketPage> {
         stream: _repository.messages,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                "Lỗi: ${snapshot.error}",
-                style: TextStyle(color: Colors.white),
-              ),
-            );
+            return Center(child: Text("Lỗi: ${snapshot.error}", style: TextStyle(color: Colors.white)));
           }
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
+
           final model = snapshot.data as DetectionModel;
           final imageBytes = base64Decode(model.image);
           final detections = model.detections;
@@ -61,17 +78,12 @@ class _WebSocketPageState extends State<WebSocketPage> {
                       fit: BoxFit.contain,
                       gaplessPlayback: true,
                     ),
-                    // Vẽ khung nhận diện
+                    // KHI BẤM VÀO Ô VUÔNG TRÊN ẢNH
                     DetectionOverlay(
                       detections: detections,
                       originalImageSize: const Size(320, 240),
                       onBoxTap: (label) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => VocabularyPage(word: label),
-                          ),
-                        );
+                        _handleSelection(label, model.image);
                       },
                     ),
                   ],
@@ -82,13 +94,10 @@ class _WebSocketPageState extends State<WebSocketPage> {
                 padding: EdgeInsets.all(12.0),
                 child: Text(
                   "Danh sách đồ vật đã phát hiện",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ),
+              
               Expanded(
                 child: Container(
                   color: Colors.grey[900],
@@ -97,39 +106,22 @@ class _WebSocketPageState extends State<WebSocketPage> {
                     itemBuilder: (context, index) {
                       final item = detections[index];
                       final String label = item['class_name'] ?? 'Unknown';
-                      final double confidence = (item['confidence'] ?? 0.0)
-                          .toDouble();
+                      final double confidence = (item['confidence'] ?? 0.0).toDouble();
 
                       return ListTile(
-                        leading: Icon(
-                          Icons.lens,
-                          color: getColorForLabel(label),
-                        ),
+                        leading: Icon(Icons.lens, color: getColorForLabel(label)),
                         title: Text(
                           label.toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                         subtitle: Text(
                           "Độ tin cậy: ${(confidence * 100).toStringAsFixed(1)}%",
                           style: const TextStyle(color: Colors.grey),
                         ),
-                        trailing: Text(
-                          "${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}",
-                          style: const TextStyle(
-                            color: Colors.blueGrey,
-                            fontSize: 12,
-                          ),
-                        ),
+                        trailing: const Icon(Icons.history, color: Colors.blueGrey, size: 18),
+                        // KHI BẤM VÀO DÒNG DANH SÁCH
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => VocabularyPage(word: label),
-                            ),
-                          );
+                          _handleSelection(label, model.image);
                         },
                       );
                     },

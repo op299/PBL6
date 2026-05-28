@@ -1,5 +1,5 @@
 class AppConfig {
-  static const String ipAddress = '192.168.10.155';
+  static const String ipAddress = '172.31.99.31';
   static const String port = '8000';
 
   static const String baseUrl = 'http://$ipAddress:$port';

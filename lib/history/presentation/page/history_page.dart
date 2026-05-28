@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import '../../../core/constants/app_config.dart';
-import '../../data/model/history_model.dart';
+import '../../../core/helpers/local_db_helper.dart';
+import '../../data/model/history_model.dart'; 
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -13,24 +12,19 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  
-  Future<List<LearningHistory>> _fetchHistory() async {
+  final LocalDbHelper _dbHelper = LocalDbHelper();
+
+  // Lấy dữ liệu từ Database nội bộ và chuyển sang danh sách Model
+  Future<List<LearningHistory>> _fetchLocalHistory() async {
     try {
-      final response = await http.get(Uri.parse(AppConfig.historyUrl));
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> decodedData = jsonDecode(
-          utf8.decode(response.bodyBytes),
-        );
-
-        final List<dynamic> listData = decodedData['history'] ?? [];
-
-        return listData.map((item) => LearningHistory.fromJson(item)).toList();
-      } else {
-        throw Exception("Lỗi Server: ${response.statusCode}");
-      }
+      final List<Map<String, dynamic>> localData = await _dbHelper
+          .getAllHistory();
+      return localData
+          .map((item) => LearningHistory.fromLocalMap(item))
+          .toList();
     } catch (e) {
-      throw Exception("Không thể tải lịch sử: $e");
+      debugPrint("Lỗi lấy dữ liệu local: $e");
+      return [];
     }
   }
 
@@ -46,14 +40,18 @@ class _HistoryPageState extends State<HistoryPage> {
           style: TextStyle(
             color: const Color(0xFF66C457),
             fontWeight: FontWeight.bold,
-            fontSize: 40 * scale,
+            fontSize: 45 * scale,
           ),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF66C457)),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: const Color(0xFF66C457),
+            size: 40 * scale,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -66,29 +64,27 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
         ),
         child: FutureBuilder<List<LearningHistory>>(
-          future: _fetchHistory(),
+          future: _fetchLocalHistory(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
                 child: CircularProgressIndicator(color: Color(0xFF66C457)),
               );
             }
+
             if (snapshot.hasError) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Text(
-                    "Lỗi: ${snapshot.error}",
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              );
+              return Center(child: Text("Đã xảy ra lỗi: ${snapshot.error}"));
             }
 
             final historyList = snapshot.data ?? [];
 
             if (historyList.isEmpty) {
-              return const Center(child: Text("Bạn chưa có lịch sử học tập."));
+              return Center(
+                child: Text(
+                  "Bạn chưa có lịch sử học tập nào.",
+                  style: TextStyle(fontSize: 35 * scale, color: Colors.grey),
+                ),
+              );
             }
 
             return ListView.builder(
@@ -99,9 +95,15 @@ class _HistoryPageState extends State<HistoryPage> {
               itemCount: historyList.length,
               itemBuilder: (context, index) {
                 final item = historyList[index];
+
+                // Dùng DateFormat trực tiếp từ item.timestamp (là kiểu DateTime)
+                final String formattedTime = DateFormat(
+                  'HH:mm - dd/MM/yyyy',
+                ).format(item.timestamp);
+
                 return Container(
                   margin: EdgeInsets.only(bottom: 30 * scale),
-                  padding: EdgeInsets.all(35 * scale),
+                  padding: EdgeInsets.all(30 * scale),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(35 * scale),
@@ -115,18 +117,27 @@ class _HistoryPageState extends State<HistoryPage> {
                   ),
                   child: Row(
                     children: [
-                      CircleAvatar(
-                        radius: 50 * scale,
-                        backgroundColor: const Color(
-                          0xFF66C457,
-                        ).withOpacity(0.1),
-                        child: Icon(
-                          item.sessionType == 'detection'
-                              ? Icons.camera_alt_rounded
-                              : Icons.quiz_rounded,
-                          color: const Color(0xFF66C457),
-                          size: 50 * scale,
-                        ),
+                      // Hiển thị ảnh Base64
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(20 * scale),
+                        child:
+                            item.imageData != null && item.imageData!.isNotEmpty
+                            ? Image.memory(
+                                base64Decode(item.imageData!),
+                                width: 180 * scale,
+                                height: 180 * scale,
+                                fit: BoxFit.cover,
+                              )
+                            : Container(
+                                width: 180 * scale,
+                                height: 180 * scale,
+                                color: Colors.grey[200],
+                                child: Icon(
+                                  Icons.image,
+                                  color: Colors.grey,
+                                  size: 60 * scale,
+                                ),
+                              ),
                       ),
                       SizedBox(width: 40 * scale),
                       Expanded(
@@ -137,23 +148,25 @@ class _HistoryPageState extends State<HistoryPage> {
                               item.objectNameEn.toUpperCase(),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 38 * scale,
+                                fontSize: 40 * scale,
                                 color: Colors.black87,
+                              ),
+                            ),
+                            SizedBox(height: 10 * scale),
+                            Text(
+                              "Ngày học: $formattedTime",
+                              style: TextStyle(
+                                fontSize: 28 * scale,
+                                color: Colors.grey[600],
                               ),
                             ),
                             SizedBox(height: 5 * scale),
                             Text(
-                              "Nghĩa: ${item.objectNameVn}",
+                              "Nguồn: Nhận diện Camera",
                               style: TextStyle(
-                                fontSize: 30 * scale,
+                                fontSize: 24 * scale,
                                 color: const Color(0xFF66C457),
-                              ),
-                            ),
-                            Text(
-                              "Độ tin cậy: ${(item.confidence * 100).toStringAsFixed(0)}% • ${DateFormat('HH:mm dd/MM').format(item.timestamp)}",
-                              style: TextStyle(
-                                fontSize: 26 * scale,
-                                color: Colors.grey,
+                                fontStyle: FontStyle.italic,
                               ),
                             ),
                           ],
