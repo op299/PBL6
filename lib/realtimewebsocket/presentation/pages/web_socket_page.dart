@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb; // Thêm dòng này để kiểm tra Web
 import 'package:pbl/core/constants/app_config.dart';
 import '../widgets/color_widgets.dart';
 import '../widgets/DetectionOverlay.dart';
@@ -25,15 +26,25 @@ class _WebSocketPageState extends State<WebSocketPage> {
     _repository.connect(AppConfig.wsUrl);
   }
 
-  // HÀM XỬ LÝ LƯU VÀ CHUYỂN TRANG (Dùng chung cho cả Box và List)
+  // HÀM XỬ LÝ LƯU VÀ CHUYỂN TRANG
   void _handleSelection(String label, String imageBase64) async {
-    // 1. CHỤP ẢNH & LƯU LẠI: Lưu tên vật thể và chuỗi ảnh vào máy
-    await _dbHelper.saveToHistory(label, imageBase64);
-    
-    // In log để bạn kiểm tra trong Console
-    print(" Đã chụp ảnh vật thể: $label");
+    print("Đang xử lý vật thể: $label");
 
-    // 2. CHUYỂN TRANG
+    // 1. CHỤP ẢNH & LƯU LẠI
+    try {
+      // sqflite không hỗ trợ Web, nên chỉ chạy khi là Mobile (Android/iOS)
+      if (!kIsWeb) {
+        await _dbHelper.saveToHistory(label, imageBase64);
+        print("Đã lưu lịch sử vào điện thoại.");
+      } else {
+        print("Chế độ Web: Bỏ qua việc lưu Database (sqflite không hỗ trợ Web).");
+      }
+    } catch (e) {
+      // Nếu có lỗi ở Database (như trên Web), in lỗi ra nhưng VẪN CHẠY TIẾP để chuyển trang
+      print("Lỗi Database: $e");
+    }
+    
+    // 2. CHUYỂN TRANG (Lệnh này bây giờ chắc chắn sẽ được chạy)
     if (mounted) {
       Navigator.push(
         context,
@@ -105,6 +116,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
                     itemCount: detections.length,
                     itemBuilder: (context, index) {
                       final item = detections[index];
+                      // Sửa lại class_name cho khớp với BE của bạn
                       final String label = item['class_name'] ?? 'Unknown';
                       final double confidence = (item['confidence'] ?? 0.0).toDouble();
 
@@ -119,7 +131,6 @@ class _WebSocketPageState extends State<WebSocketPage> {
                           style: const TextStyle(color: Colors.grey),
                         ),
                         trailing: const Icon(Icons.history, color: Colors.blueGrey, size: 18),
-                        // KHI BẤM VÀO DÒNG DANH SÁCH
                         onTap: () {
                           _handleSelection(label, model.image);
                         },
