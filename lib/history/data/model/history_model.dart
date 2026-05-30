@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class LearningHistory {
   final int historyId;
   final String objectNameEn;
@@ -5,7 +7,8 @@ class LearningHistory {
   final double confidence;
   final String sessionType;
   final DateTime timestamp;
-  final String? imageData; 
+  final String? imageData;
+  final List<double> box;
 
   LearningHistory({
     required this.historyId,
@@ -14,9 +17,9 @@ class LearningHistory {
     required this.confidence,
     required this.sessionType,
     required this.timestamp,
-    this.imageData, 
+    this.imageData,
+    required this.box,
   });
-
   factory LearningHistory.fromJson(Map<String, dynamic> json) {
     return LearningHistory(
       historyId: json['history_id'] ?? 0,
@@ -27,20 +30,23 @@ class LearningHistory {
       timestamp: DateTime.parse(
         json['timestamp'] ?? DateTime.now().toIso8601String(),
       ),
+      box: List<double>.from(json['box'] ?? [0.0, 0.0, 0.0, 0.0]),
     );
   }
-
 
   factory LearningHistory.fromLocalMap(Map<String, dynamic> map) {
     return LearningHistory(
       historyId: map['id'] ?? 0,
-      objectNameEn: map['object_name'] ?? '', 
-      objectNameVn: '', 
+      objectNameEn: map['object_name'] ?? '',
+      objectNameVn: '',
       confidence: (map['confidence'] ?? 0.0).toDouble(),
       sessionType: 'detection',
       imageData: map['image_data'],
       timestamp: DateTime.parse(
         map['timestamp'] ?? DateTime.now().toIso8601String(),
+      ),
+      box: List<double>.from(
+        jsonDecode(map['box_data'] ?? '[0.0, 0.0, 0.0, 0.0]')
       ),
     );
   }

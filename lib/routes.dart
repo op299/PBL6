@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pbl/pages/dashboard.dart';
 import 'package:pbl/pages/login_page.dart';
 import 'package:pbl/pages/quiz_mode_page.dart';
-import 'package:pbl/pages/quiz_page.dart';
 import 'package:pbl/pages/register_page.dart';
-import 'package:pbl/pages/result_page.dart';
 import 'package:pbl/pages/vocabulary.dart';
 import 'package:pbl/pages/grammar.dart';
 import 'package:pbl/pages/conversations.dart';
@@ -27,6 +25,7 @@ class AppRoutes {
   static const String history = '/history';
   static const String quizResult = '/quiz_result';
 
+
   static Map<String, WidgetBuilder> getRoutes() {
     return {
       dashboard: (context) => const DashboardPage(),
@@ -39,6 +38,7 @@ class AppRoutes {
       quiz: (context) => const QuizModePage(),
       profile: (context) => const ProfilePage(),
       history: (context) => const HistoryPage(),
+      
     };
   }
 }
