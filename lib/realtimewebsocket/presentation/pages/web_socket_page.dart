@@ -27,33 +27,41 @@ class _WebSocketPageState extends State<WebSocketPage> {
   }
 
   // HÀM XỬ LÝ LƯU VÀ CHUYỂN TRANG
-  void _handleSelection(String label, String imageBase64) async {
-    print("Đang xử lý vật thể: $label");
+void _handleSelection(String label, String imageBase64, List<dynamic> detections) async {
+  print(" Đang xử lý vật thể: $label");
 
-    // 1. CHỤP ẢNH & LƯU LẠI
-    try {
-      // sqflite không hỗ trợ Web, nên chỉ chạy khi là Mobile (Android/iOS)
-      if (!kIsWeb) {
-        await _dbHelper.saveToHistory(label, imageBase64);
-        print("Đã lưu lịch sử vào điện thoại.");
-      } else {
-        print("Chế độ Web: Bỏ qua việc lưu Database (sqflite không hỗ trợ Web).");
-      }
-    } catch (e) {
-      // Nếu có lỗi ở Database (như trên Web), in lỗi ra nhưng VẪN CHẠY TIẾP để chuyển trang
-      print("Lỗi Database: $e");
-    }
-    
-    // 2. CHUYỂN TRANG (Lệnh này bây giờ chắc chắn sẽ được chạy)
-    if (mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => VocabularyPage(word: label),
-        ),
+  // 1. CHỤP ẢNH & LƯU LẠI
+  try {
+    if (!kIsWeb) {
+      // Tìm vật thể trong danh sách detections để lấy tọa độ khung (box)
+      final det = detections.firstWhere(
+        (d) => (d['class_name'] ?? d['label']) == label,
+        orElse: () => {},
       );
+      
+      // Lấy mảng [x1, y1, x2, y2]
+      final List<dynamic> box = det['bbox'] ?? det['box'] ?? [0, 0, 0, 0];
+
+      // GỬI THÊM 'box' VÀO HÀM LƯU
+      await _dbHelper.saveToHistory(label, imageBase64, box);
+      print(" Đã lưu lịch sử kèm tọa độ khung vào điện thoại.");
+    } else {
+      print(" Chế độ Web: Bỏ qua việc lưu Database.");
     }
+  } catch (e) {
+    print(" Lỗi Database: $e");
   }
+  
+  // 2. CHUYỂN TRANG
+  if (mounted) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VocabularyPage(word: label),
+      ),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +102,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
                       detections: detections,
                       originalImageSize: const Size(320, 240),
                       onBoxTap: (label) {
-                        _handleSelection(label, model.image);
+                        _handleSelection(label, model.image, detections);
                       },
                     ),
                   ],
@@ -132,7 +140,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
                         ),
                         trailing: const Icon(Icons.history, color: Colors.blueGrey, size: 18),
                         onTap: () {
-                          _handleSelection(label, model.image);
+                          _handleSelection(label, model.image, detections);
                         },
                       );
                     },
