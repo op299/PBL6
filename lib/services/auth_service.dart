@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
   // Base URL của API, đảm bảo đã được cấu hình đúng
   // Thay thế bằng địa chỉ IP và cổng chính xác của máy chủ backend của bạn
-  final String _authBaseUrl = 'http://172.31.99.31:8000/api/v1/auth';
+  final String _authBaseUrl = AppConfig.authUrl;
 
   // Phương thức đăng nhập
   Future<Map<String, dynamic>> login(String username, String password) async {
@@ -76,8 +76,11 @@ class AuthService {
         headers: {'Content-Type': 'application/json'},
         body: json.encode(userData),
       );
+      // Accept 200 OK and 201 Created as successful registration responses
+      print('Register response status: ${response.statusCode}');
+      print('Register response body: ${response.body}');
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return {
           'success': true,
           'message': 'Đăng ký thành công! Vui lòng đăng nhập.',
@@ -129,7 +132,7 @@ class AuthService {
     // (Tùy chọn) Gọi API logout backend nếu server của bạn cần invalidate token
     // Tuy nhiên, với JWT, việc xóa token client-side thường là đủ để người dùng không còn được xác thực.
     // try {
-    //   final String _authBaseUrl = 'http://10.241.181.118:8000/api/v1/auth';
+    //   final String _authBaseUrl = 'http://1.1.1.29:8000/api/v1/auth';
     //   final response = await http.post(Uri.parse('$_authBaseUrl/logout'), headers: {
     //     'Authorization': 'Bearer YOUR_SAVED_ACCESS_TOKEN', // Cần lấy token đã lưu để gửi
     //   });

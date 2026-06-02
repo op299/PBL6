@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:pbl/core/constants/app_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/quiz_model.dart';
 
 class QuizService {
-  final String baseUrl = 'http://172.31.99.31:8000/api/v1/quiz';
+  final String baseUrl = AppConfig.quizUrl;
 
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();

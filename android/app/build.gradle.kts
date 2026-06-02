@@ -1,10 +1,13 @@
+plugins {
+    id("com.android.application")
+    id("kotlin-android")
+    id("dev.flutter.flutter-gradle-plugin")
+}
+
 android {
     namespace = "com.example.pbl"
-    // 1. Hạ compileSdk xuống 35 (bản 36 hiện tại quá mới, dễ lỗi với plugin)
-    compileSdk = 35 
-    
-    // 2. Sửa lại ĐÚNG phiên bản NDK mà lỗi yêu cầu
-    ndkVersion = "27.0.12077973" 
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -17,15 +20,19 @@ android {
 
     defaultConfig {
         applicationId = "com.example.pbl"
-        
-        // 3. Sửa minSdk thành 21 (Bắt buộc để chạy được SQLite/sqflite)
-        minSdk = 21 
-        
-        // 4. Khớp targetSdk với compileSdk
-        targetSdk = 35 
-        
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
-    // ... giữ nguyên phần còn lại
+
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+}
+
+flutter {
+    source = "../.."
 }
