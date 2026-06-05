@@ -37,13 +37,13 @@ class DetectionOverlay extends StatelessWidget {
               height: height,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: (){
-                  print ("Dữ liệu :$det:");
-
-                  final String label = det ['class_name'] ?? 'Unknown';
+                onTap: () {
+                  print("Dữ liệu vật thể nhấn vào: $det");
+                  final String label = det['class_name'] ?? 'Unknown';
                   onBoxTap(label);
                 },
-                child: _buildBox(det['class_name'] ?? '', det['confidence'] ?? 0.0),
+                
+                child: _buildBox(det), 
               ),
             );
           }).toList(),
@@ -52,24 +52,35 @@ class DetectionOverlay extends StatelessWidget {
     );
   }
 
-  Widget _buildBox(String label, double confidence) {
-    final Color boxColor = getColorForLabel(label);
+  Widget _buildBox(Map<String, dynamic> det) {
+    final String labelEn = det['class_name'] ?? 'Unknown';
+    final String labelVn = det['object_name_vn'] ?? ''; 
+    final double confidence = (det['confidence'] ?? 0.0).toDouble();
+    
+    final Color boxColor = getColorForLabel(labelEn);
+
     return Container(
-      decoration: BoxDecoration(border: Border.all(color: boxColor, width: 2)),
-      child: Align(
-        alignment: Alignment.topLeft,
-        child: Container(
-          color: boxColor,
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-          child: Text(
-            "${label.toUpperCase()} ${(confidence * 100).toStringAsFixed(0)}%",
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
+      decoration: BoxDecoration(
+        border: Border.all(color: boxColor, width: 2),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            color: boxColor,
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            child: Text(
+              // HIỂN THỊ: ENGLISH (Tiếng Việt) 90%
+              "${labelEn.toUpperCase()} ${labelVn.isNotEmpty ? '($labelVn)' : ''} ${(confidence * 100).toStringAsFixed(0)}%",
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

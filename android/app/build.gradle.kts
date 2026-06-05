@@ -1,10 +1,15 @@
+plugins {
+    id("com.android.application")
+    id("kotlin-android")
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id("dev.flutter.flutter-gradle-plugin")
+}
+
 android {
     namespace = "com.example.pbl"
-    // 1. Hạ compileSdk xuống 35 (bản 36 hiện tại quá mới, dễ lỗi với plugin)
-    compileSdk = 35 
-    
-    // 2. Sửa lại ĐÚNG phiên bản NDK mà lỗi yêu cầu
-    ndkVersion = "27.0.12077973" 
+    // Use a stable compileSdk for compatibility
+    compileSdk = 35
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -17,15 +22,21 @@ android {
 
     defaultConfig {
         applicationId = "com.example.pbl"
-        
-        // 3. Sửa minSdk thành 21 (Bắt buộc để chạy được SQLite/sqflite)
-        minSdk = 21 
-        
-        // 4. Khớp targetSdk với compileSdk
-        targetSdk = 35 
-        
+        minSdk = flutter.minSdkVersion
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
-    // ... giữ nguyên phần còn lại
+
+    buildTypes {
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+}
+
+flutter {
+    source = "../.."
 }

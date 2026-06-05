@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
   // Base URL của API, đảm bảo đã được cấu hình đúng
   // Thay thế bằng địa chỉ IP và cổng chính xác của máy chủ backend của bạn
-  final String _authBaseUrl = 'http://172.31.99.31:8000/api/v1/auth';
+  final String _authBaseUrl = 'http://172.20.10.2:8000/api/v1/auth';
 
   // Phương thức đăng nhập
   Future<Map<String, dynamic>> login(String username, String password) async {
