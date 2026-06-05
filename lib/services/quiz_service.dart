@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/quiz_model.dart';
 
 class QuizService {
-  final String baseUrl = 'http://172.31.99.31:8000/api/v1/quiz';
+  final String baseUrl = 'http://172.20.10.2:8000/api/v1/quiz';
 
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
