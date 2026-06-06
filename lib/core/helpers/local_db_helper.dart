@@ -1,4 +1,4 @@
-import 'dart:convert'; // Thêm thư viện này để dùng jsonEncode
+import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -13,7 +13,6 @@ class LocalDbHelper {
 
   _initDb() async {
     String path = join(await getDatabasesPath(), 'learning_history.db');
-
     return await openDatabase(
       path,
       version: 3,
@@ -22,39 +21,44 @@ class LocalDbHelper {
           CREATE TABLE history(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             object_name TEXT,
+            object_name_vn TEXT,
             image_data TEXT,
-            box_data TEXT,  -- CỘT ĐỂ LƯU TỌA ĐỘ [x1, y1, x2, y2]
+            box_data TEXT,
             confidence REAL,
             timestamp TEXT
           )
         ''');
       },
-      onUpgrade: (db, oldVersion, newVersion) async {
+      onUpgrade: (db, oldVersion, newVersion) {
         if (oldVersion < 2) {
-          await db.execute("ALTER TABLE history ADD COLUMN box_data TEXT;");
+          db.execute("ALTER TABLE history ADD COLUMN box_data TEXT;");
+          db.execute("ALTER TABLE history ADD COLUMN confidence REAL;");
         }
         if (oldVersion < 3) {
-          await db.execute("ALTER TABLE history ADD COLUMN confidence REAL;");
+          db.execute("ALTER TABLE history ADD COLUMN object_name_vn TEXT;");
         }
       },
     );
   }
 
-  Future<void> saveToHistory(
-    String name,
-    String base64Image,
-    List<dynamic> box,
-    double confidence,
-  ) async {
+  // Sắp xếp lại tham số cho khoa học
+  Future<void> saveToHistory({
+    required String name,
+    required String vnName,
+    required String base64Image,
+    required List<dynamic> box,
+    required double confidence,
+  }) async {
     final db = await database;
     await db.insert('history', {
       'object_name': name,
+      'object_name_vn': vnName,
       'image_data': base64Image,
       'box_data': jsonEncode(box),
       'confidence': confidence,
       'timestamp': DateTime.now().toIso8601String(),
     });
-    print(" Đã lưu $name kèm tọa độ vào máy!");
+    print(" Đã lưu $name ($vnName) vào máy!");
   }
 
   Future<List<Map<String, dynamic>>> getAllHistory() async {
