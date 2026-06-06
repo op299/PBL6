@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data'; // Cần thiết để xử lý mảng byte ảnh
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pbl/core/constants/app_config.dart';
@@ -19,8 +20,9 @@ class _WebSocketPageState extends State<WebSocketPage> {
   final IWebSocketRepository _repository = WebSocketRepositoryImpl();
   final LocalDbHelper _dbHelper = LocalDbHelper();
 
-  bool _isStudyMode = false; // Trạng thái START/STOP
+  bool _isStudyMode = false;
   String? _lastSavedObject;
+  Uint8List? _lastFrame; // LƯU KHUNG HÌNH CUỐI CÙNG ĐỂ CHỐNG ĐEN MÀN HÌNH
 
   @override
   void initState() {
@@ -33,37 +35,37 @@ class _WebSocketPageState extends State<WebSocketPage> {
     String imageBase64,
     List<dynamic> detections,
   ) async {
-    if (kIsWeb) return; // Web không lưu được SQLite
+    if (kIsWeb) return;
     try {
       final det = detections.firstWhere(
         (d) => (d['class_name'] ?? d['label']) == label,
         orElse: () => {},
       );
-
-      
       if (det.isEmpty) return;
 
       final List<dynamic> box =
           det['bbox'] ?? det['box'] ?? [0.0, 0.0, 0.0, 0.0];
       final double confidence = (det['confidence'] ?? 0.0).toDouble();
-
-      // Thực hiện lưu vào máy
-      await _dbHelper.saveToHistory(label, imageBase64, box, confidence);
-      print(" Đã lưu vào máy: $label");
+      final String nameVn = det['name_vn'] ?? ''; // Lấy tên tiếng Việt từ BE
+      await _dbHelper.saveToHistory(
+        name: label,
+        vnName: nameVn,
+        base64Image: imageBase64,
+        box: box,
+        confidence: confidence,
+      );
     } catch (e) {
-      print(" Lỗi khi lưu: $e");
+      print(" Lỗi lưu DB: $e");
     }
   }
 
-
+  // HÀM XỬ LÝ KHI NGƯỜI DÙNG NHẤN THỦ CÔNG
   void _handleManualSelection(
     String label,
     String imageBase64,
     List<dynamic> detections,
   ) async {
-    await _saveLocal(label, imageBase64, detections); 
-
-    
+    await _saveLocal(label, imageBase64, detections);
     if (mounted) {
       Navigator.push(
         context,
@@ -77,7 +79,9 @@ class _WebSocketPageState extends State<WebSocketPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text(_isStudyMode ? "STUDY MODE" : "PREVIEW MODE"),
+        title: Text(
+          _isStudyMode ? "STUDY MODE (START)" : "PREVIEW MODE (STOP)",
+        ),
         backgroundColor: _isStudyMode
             ? Colors.green[800]
             : Colors.blueGrey[900],
@@ -86,16 +90,18 @@ class _WebSocketPageState extends State<WebSocketPage> {
       body: StreamBuilder(
         stream: _repository.messages,
         builder: (context, snapshot) {
-          if (!snapshot.hasData)
+          // Nếu chưa bao giờ có dữ liệu và cũng chưa có frame nào trong bộ nhớ đệm
+          if (!snapshot.hasData && _lastFrame == null) {
             return const Center(child: CircularProgressIndicator());
+          }
 
           final model = snapshot.data as DetectionModel;
 
-          // 1. Cập nhật trạng thái START/STOP từ Backend bằng SnackBar (Không dùng màn hình đen chặn build)
+          // 1. CẬP NHẬT TRẠNG THÁI START/STOP
           if (_isStudyMode != model.studySessionActive) {
             _isStudyMode = model.studySessionActive;
             Future.delayed(Duration.zero, () {
-              setState(() {}); // Cập nhật màu AppBar
+              setState(() {}); // Để đổi màu AppBar
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
@@ -122,17 +128,16 @@ class _WebSocketPageState extends State<WebSocketPage> {
                   SnackBar(
                     content: Text(" TỰ ĐỘNG LƯU: ${stableLabel.toUpperCase()}"),
                     backgroundColor: Colors.blueAccent,
-                    duration: const Duration(seconds: 1),
                   ),
                 );
               });
             }
           }
 
-          // 3. HIỂN THỊ GIAO DIỆN CAMERA (Luôn hiển thị kể cả khi nhận tin nhắn status)
-          final imageBytes = model.image != null
-              ? base64Decode(model.image!)
-              : null;
+          // 3. CẬP NHẬT BỘ NHỚ ĐỆM HÌNH ẢNH
+          if (model.image != null) {
+            _lastFrame = base64Decode(model.image!);
+          }
 
           return Column(
             children: [
@@ -140,10 +145,10 @@ class _WebSocketPageState extends State<WebSocketPage> {
                 aspectRatio: 320 / 240,
                 child: Stack(
                   children: [
-                    // Hiển thị ảnh Camera
-                    if (imageBytes != null)
+                    // Hiển thị ảnh: Ưu tiên ảnh mới, nếu không có dùng ảnh cũ (_lastFrame)
+                    if (_lastFrame != null)
                       Image.memory(
-                        imageBytes,
+                        _lastFrame!,
                         width: double.infinity,
                         fit: BoxFit.contain,
                         gaplessPlayback: true,
@@ -163,7 +168,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
                         originalImageSize: const Size(320, 240),
                         onBoxTap: (label) => _handleManualSelection(
                           label,
-                          model.image!,
+                          model.image ?? '',
                           model.detections,
                         ),
                       ),
@@ -179,7 +184,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
                         ),
                         color: _isStudyMode ? Colors.green : Colors.red,
                         child: Text(
-                          _isStudyMode ? "STUDYING" : "PREVIEW",
+                          _isStudyMode ? "STUDYING" : "STOPPED",
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 10,
@@ -240,7 +245,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
                               onTap: _isStudyMode
                                   ? () => _handleManualSelection(
                                       label,
-                                      model.image!,
+                                      model.image ?? '',
                                       model.detections,
                                     )
                                   : null,

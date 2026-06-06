@@ -27,10 +27,8 @@ class LearningHistory {
       historyId: json['history_id'] ?? 0,
       objectNameEn: json['object_name_en'] ?? '',
       objectNameVn: json['object_name_vn'] ?? '',
-      
       confidence: (json['confidence'] as num? ?? 0.0).toDouble(),
       sessionType: json['session_type'] ?? 'detection',
-      // Lấy ảnh từ BE (nếu BE có trả về trường image_data)
       imageData: json['image_data'],
       timestamp: DateTime.parse(
         json['timestamp'] ?? DateTime.now().toIso8601String(),
@@ -47,14 +45,13 @@ class LearningHistory {
     return LearningHistory(
       historyId: map['id'] ?? 0,
       objectNameEn: map['object_name'] ?? 'Unknown',
-      objectNameVn: '', // Local SQLite thường không lưu nghĩa tiếng Việt
+      objectNameVn: '', 
       confidence: (map['confidence'] as num? ?? 0.0).toDouble(),
       sessionType: 'detection',
       imageData: map['image_data'],
       timestamp: DateTime.parse(
         map['timestamp'] ?? DateTime.now().toIso8601String(),
       ),
-      // Vì SQLite lưu List dưới dạng chuỗi String, nên phải jsonDecode
       box: (jsonDecode(map['box_data'] ?? '[0.0, 0.0, 0.0, 0.0]') as List)
           .map((e) => (e as num).toDouble())
           .toList(),
