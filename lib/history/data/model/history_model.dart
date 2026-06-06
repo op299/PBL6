@@ -27,7 +27,7 @@ class LearningHistory {
       historyId: json['history_id'] ?? 0,
       objectNameEn: json['object_name_en'] ?? '',
       objectNameVn: json['object_name_vn'] ?? '',
-      // Ép kiểu num sang double để tránh lỗi số nguyên (ví dụ: 1 -> 1.0)
+      
       confidence: (json['confidence'] as num? ?? 0.0).toDouble(),
       sessionType: json['session_type'] ?? 'detection',
       // Lấy ảnh từ BE (nếu BE có trả về trường image_data)
