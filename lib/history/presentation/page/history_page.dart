@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import '../../../core/constants/app_config.dart';
+import '../../../core/helpers/local_db_helper.dart';
 import '../../data/model/history_model.dart';
-import 'history_detail_page.dart';
+import 'history_detail_page.dart'; 
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -14,34 +13,28 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  final LocalDbHelper _dbHelper = LocalDbHelper();
   late Future<List<LearningHistory>> _historyFuture;
 
   @override
   void initState() {
     super.initState();
-    _historyFuture = _fetchHistoryFromBE();
+    _historyFuture = _fetchHistoryFromLocal();
   }
 
-  Future<List<LearningHistory>> _fetchHistoryFromBE() async {
+  Future<List<LearningHistory>> _fetchHistoryFromLocal() async {
     try {
-      final response = await http.get(Uri.parse(AppConfig.historyUrl));
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> decodedData = jsonDecode(
-          utf8.decode(response.bodyBytes),
-        );
-        final List<dynamic> listData = decodedData['history'] ?? [];
-        return listData.map((item) => LearningHistory.fromJson(item)).toList();
-      }
-      return [];
+      final List<Map<String, dynamic>> localData = await _dbHelper.getAllHistory();
+      return localData.map((item) => LearningHistory.fromLocalMap(item)).toList();
     } catch (e) {
-      debugPrint("❌ Lỗi kết nối BE: $e");
+      debugPrint(" Lỗi lấy lịch sử local: $e");
       return [];
     }
   }
 
   Future<void> _handleRefresh() async {
     setState(() {
-      _historyFuture = _fetchHistoryFromBE();
+      _historyFuture = _fetchHistoryFromLocal();
     });
   }
 
@@ -51,9 +44,10 @@ class _HistoryPageState extends State<HistoryPage> {
     final double scale = screenWidth / 1080;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          "LỊCH SỬ HỌC",
+          "HISTORY",
           style: TextStyle(
             color: const Color(0xFF66C457),
             fontWeight: FontWeight.bold,
@@ -64,11 +58,7 @@ class _HistoryPageState extends State<HistoryPage> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: const Color(0xFF66C457),
-            size: 40 * scale,
-          ),
+          icon: Icon(Icons.arrow_back_ios, color: const Color(0xFF66C457), size: 40 * scale),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -87,16 +77,15 @@ class _HistoryPageState extends State<HistoryPage> {
             future: _historyFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF66C457)),
-                );
+                return const Center(child: CircularProgressIndicator(color: Color(0xFF66C457)));
               }
+              
               final list = snapshot.data ?? [];
               if (list.isEmpty) {
                 return ListView(
                   children: [
                     SizedBox(height: 300 * scale),
-                    const Center(child: Text("Chưa có dữ liệu lịch sử.")),
+                    const Center(child: Text("Chưa có lịch sử. Hãy quét vật thể ở Study Mode!")),
                   ],
                 );
               }
@@ -106,12 +95,12 @@ class _HistoryPageState extends State<HistoryPage> {
                 itemCount: list.length,
                 itemBuilder: (context, index) {
                   final item = list[index];
+                  final String formattedTime = DateFormat('HH:mm dd/MM/yyyy').format(item.timestamp);
+
                   return GestureDetector(
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => HistoryDetailPage(item: item),
-                      ),
+                      MaterialPageRoute(builder: (context) => HistoryDetailPage(item: item)),
                     ),
                     child: Container(
                       margin: EdgeInsets.only(bottom: 35 * scale),
@@ -119,18 +108,13 @@ class _HistoryPageState extends State<HistoryPage> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(30 * scale),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                          ),
-                        ],
+                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
                       ),
                       child: Row(
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(20 * scale),
-                            child: item.imageData != null
+                            child: item.imageData != null && item.imageData!.isNotEmpty
                                 ? Image.memory(
                                     base64Decode(item.imageData!),
                                     width: 200 * scale,
@@ -141,10 +125,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                     width: 200 * scale,
                                     height: 200 * scale,
                                     color: Colors.grey[200],
-                                    child: Icon(
-                                      Icons.image,
-                                      color: Colors.grey,
-                                    ),
+                                    child: Icon(Icons.image, color: Colors.grey, size: 60 * scale),
                                   ),
                           ),
                           SizedBox(width: 40 * scale),
@@ -154,35 +135,20 @@ class _HistoryPageState extends State<HistoryPage> {
                               children: [
                                 Text(
                                   item.objectNameEn.toUpperCase(),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 40 * scale,
-                                  ),
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40 * scale),
                                 ),
                                 Text(
-                                  "Nghĩa: ${item.objectNameVn}",
-                                  style: TextStyle(
-                                    fontSize: 30 * scale,
-                                    color: const Color(0xFF66C457),
-                                  ),
+                                  "Nghĩa: ${item.objectNameVn.isNotEmpty ? item.objectNameVn : 'Chưa có'}",
+                                  style: TextStyle(fontSize: 30 * scale, color: const Color(0xFF66C457)),
                                 ),
                                 Text(
-                                  DateFormat(
-                                    'HH:mm dd/MM/yyyy',
-                                  ).format(item.timestamp),
-                                  style: TextStyle(
-                                    fontSize: 24 * scale,
-                                    color: Colors.grey,
-                                  ),
+                                  formattedTime,
+                                  style: TextStyle(fontSize: 24 * scale, color: Colors.grey),
                                 ),
                               ],
                             ),
                           ),
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            size: 30 * scale,
-                            color: Colors.grey[300],
-                          ),
+                          Icon(Icons.arrow_forward_ios, size: 30 * scale, color: Colors.grey[300]),
                         ],
                       ),
                     ),
