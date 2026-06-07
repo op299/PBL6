@@ -1,12 +1,10 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pbl/core/constants/app_config.dart';
 
 class UserService {
-  final String _baseUrl = kIsWeb
-      ? "http://localhost:8000/api/v1/auth"
-      : "http://172.20.10.2:8000/api/v1/auth";
+  final String _baseUrl = AppConfig.authUrl;
 
   Future<Map<String, dynamic>> getProfile() async {
     try {
