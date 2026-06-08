@@ -7,9 +7,8 @@ class LearningHistory {
   final double confidence;
   final String sessionType;
   final DateTime timestamp;
-  final String? imageData; // Lưu chuỗi Base64 của ảnh
-  final List<double> box; // Tọa độ [x1, y1, x2, y2]
-
+  final String? imageData; 
+  final List<double> box; 
   LearningHistory({
     required this.historyId,
     required this.objectNameEn,
@@ -21,7 +20,6 @@ class LearningHistory {
     required this.box,
   });
 
-  // 1. DÙNG CHO DỮ LIỆU TỪ BACKEND (API)
   factory LearningHistory.fromJson(Map<String, dynamic> json) {
     return LearningHistory(
       historyId: json['history_id'] ?? 0,
@@ -33,19 +31,17 @@ class LearningHistory {
       timestamp: DateTime.parse(
         json['timestamp'] ?? DateTime.now().toIso8601String(),
       ),
-      // Ép kiểu an toàn cho danh sách tọa độ
       box: (json['box'] as List? ?? [0.0, 0.0, 0.0, 0.0])
           .map((e) => (e as num).toDouble())
           .toList(),
     );
   }
 
-  // 2. DÙNG CHO DỮ LIỆU TỪ MÁY ĐIỆN THOẠI (SQLITE)
   factory LearningHistory.fromLocalMap(Map<String, dynamic> map) {
     return LearningHistory(
       historyId: map['id'] ?? 0,
       objectNameEn: map['object_name'] ?? 'Unknown',
-      objectNameVn: '', 
+      objectNameVn: map['object_name_vn']  ?? '',
       confidence: (map['confidence'] as num? ?? 0.0).toDouble(),
       sessionType: 'detection',
       imageData: map['image_data'],

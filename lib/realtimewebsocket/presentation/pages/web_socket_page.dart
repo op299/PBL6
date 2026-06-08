@@ -69,7 +69,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(active ? "🚀 CHẾ ĐỘ HỌC ĐÃ BẬT" : "🛑 ĐÃ DỪNG PHIÊN HỌC"),
+        content: Text(active ? " CHẾ ĐỘ HỌC ĐÃ BẬT" : " ĐÃ DỪNG PHIÊN HỌC"),
         backgroundColor: active ? Colors.green : Colors.red,
         duration: const Duration(seconds: 2),
       ),
@@ -84,7 +84,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("✅ TỰ ĐỘNG LƯU: ${stableLabel.toUpperCase()}"),
+            content: Text(" TỰ ĐỘNG LƯU: ${stableLabel.toUpperCase()}"),
             backgroundColor: Colors.blueAccent,
             duration: const Duration(seconds: 1),
           ),
@@ -108,7 +108,7 @@ class _WebSocketPageState extends State<WebSocketPage> {
       final List<dynamic> box =
           det['bbox'] ?? det['box'] ?? [0.0, 0.0, 0.0, 0.0];
       final double confidence = (det['confidence'] ?? 0.0).toDouble();
-      final String nameVn = det['name_vn'] ?? '';
+      final String nameVn = det['name_vn'] ?? det['class_name_vn'] ?? '';
 
       await _dbHelper.saveToHistory(
         name: label,
