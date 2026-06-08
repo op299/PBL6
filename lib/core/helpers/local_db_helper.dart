@@ -40,8 +40,6 @@ class LocalDbHelper {
       },
     );
   }
-
-  // Sắp xếp lại tham số cho khoa học
   Future<void> saveToHistory({
     required String name,
     required String vnName,
@@ -65,4 +63,13 @@ class LocalDbHelper {
     final db = await database;
     return await db.query('history', orderBy: 'id DESC');
   }
+  Future<void> deleteHistory(int id) async {
+  final db = await database;
+  await db.delete(
+    'history',
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+  print(" Đã xóa mục lịch sử ID: $id");
+}
 }

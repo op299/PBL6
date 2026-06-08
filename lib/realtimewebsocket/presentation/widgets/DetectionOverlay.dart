@@ -22,7 +22,7 @@ class DetectionOverlay extends StatelessWidget {
 
         return Stack(
           children: detections.map((det) {
-            final box = det['bbox'];
+            final box = det['bbox'] ;
             if (box == null) return const SizedBox.shrink();
 
             double left = box[0] * scaleX;
@@ -38,11 +38,9 @@ class DetectionOverlay extends StatelessWidget {
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
-                  print("Dữ liệu vật thể nhấn vào: $det");
                   final String label = det['class_name'] ?? 'Unknown';
                   onBoxTap(label);
                 },
-                
                 child: _buildBox(det), 
               ),
             );
@@ -54,29 +52,40 @@ class DetectionOverlay extends StatelessWidget {
 
   Widget _buildBox(Map<String, dynamic> det) {
     final String labelEn = det['class_name'] ?? 'Unknown';
-    final String labelVn = det['object_name_vn'] ?? ''; 
+    final String labelVn = det['name_vn'] ?? det['object_name_vn'] ?? ''; 
     final double confidence = (det['confidence'] ?? 0.0).toDouble();
     
     final Color boxColor = getColorForLabel(labelEn);
 
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: boxColor, width: 2),
+        border: Border.all(color: boxColor, width: 2.5),
+        borderRadius: BorderRadius.circular(8),
+        color: boxColor.withOpacity(0.05), 
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
+        clipBehavior: Clip.none, 
         children: [
-          Container(
-            color: boxColor,
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            child: Text(
-              // HIỂN THỊ: ENGLISH (Tiếng Việt) 90%
-              "${labelEn.toUpperCase()} ${labelVn.isNotEmpty ? '($labelVn)' : ''} ${(confidence * 100).toStringAsFixed(0)}%",
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
+          Positioned(
+            top: -25, 
+            left: -2.5,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: boxColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  topRight: Radius.circular(8),
+                ),
+              ),
+              child: Text(
+                "${labelEn.toUpperCase()} ${labelVn.isNotEmpty ? '($labelVn)' : ''} ${(confidence * 100).toStringAsFixed(0)}%",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w900, 
+                  letterSpacing: 0.5,
+                ),
               ),
             ),
           ),
